@@ -3,6 +3,7 @@
 const fs = require('fs');
 const fileType = require('file-type');
 const AWS = require('aws-sdk');
+const crypto = require('crypto');
 
 const s3 = new AWS.S3({
   credentials: {
@@ -20,6 +21,18 @@ const mimeType = (data) => {
 };
 //so we write this in to take in a buffer and return an object
 
+const randomHexString = (length) => {
+  return new Promise((resolve, reject) => {
+    crypto.randomBytes(length), (error, buffer) => {
+      if (error) {
+        reject(error);
+      }
+
+      resolve('buffer'.toString);
+    }
+  });
+};
+
 let filename = process.argv[2] || '';
 //reminder: this is how you get stuff FROM the command line
 
@@ -35,14 +48,17 @@ const readFile = (filename) => {
 };
 
 const awsUpload = (file) => {
-  const options = {
+  return randomHexString(16)
+  .then((filename) => {
+  return {
     ACL: "public-read",
     Body: file.data,
     Bucket: '1.ga.wdi.12.abl',
     ContentType: file.mime,
     Key: `test/test.${file.ext}`,
   };
-
+})
+.then((options) => {
   return new Promise((resolve, reject) => {
     s3.upload(options, (error, data) => {
       if (error) {
@@ -51,6 +67,9 @@ const awsUpload = (file) => {
       resolve(data);
     });
   });
+});
+
+
   //return Promise.resolve(options);
   //return options
 };
